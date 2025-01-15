@@ -11,7 +11,7 @@ public class Program
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        MultiLoggerFactory loggerFactory = new(
+        DefaultLoggerFactory loggerFactory = new(
             Environment.GetEnvironmentVariable("LOG_PATH") ?? ILogger.DefaultPath,
             Environment.GetEnvironmentVariable("LOG_DATE_FORMAT") ?? ILogger.DefaultDateFormat
         );

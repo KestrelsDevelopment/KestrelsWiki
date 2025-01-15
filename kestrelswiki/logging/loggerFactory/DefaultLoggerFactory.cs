@@ -3,7 +3,7 @@ using ILogger = kestrelswiki.logging.logger.ILogger;
 
 namespace kestrelswiki.logging.loggerFactory;
 
-public class MultiLoggerFactory(string logFilePath, string dateFormat) : ILoggerFactory
+public class DefaultLoggerFactory(string logFilePath, string dateFormat) : ILoggerFactory
 {
     public ILogger CreateLogger(LogDomain logDomain)
     {
