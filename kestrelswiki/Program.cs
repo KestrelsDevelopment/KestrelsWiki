@@ -1,8 +1,9 @@
-using kestrelswiki.logging;
+using kestrelswiki.logging.logFormat;
 using kestrelswiki.logging.logger;
 using kestrelswiki.logging.loggerFactory;
 using kestrelswiki.service.file;
 using ILogger = kestrelswiki.logging.logger.ILogger;
+using ILoggerFactory = kestrelswiki.logging.loggerFactory.ILoggerFactory;
 
 namespace kestrelswiki;
 
@@ -12,7 +13,7 @@ public class Program
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        DefaultLoggerFactory loggerFactory = InitLoggerFactory();
+        ILoggerFactory loggerFactory = InitLoggerFactory();
         ILogger logger = loggerFactory.CreateLogger(LogDomain.Startup);
 
         logger.Write("Adding services to container");
@@ -45,12 +46,14 @@ public class Program
         app.Run();
     }
 
-    private static DefaultLoggerFactory InitLoggerFactory()
+    private static ILoggerFactory InitLoggerFactory()
     {
         string logFilePath = Environment.GetEnvironmentVariable("LOG_PATH") ?? ILogger.DefaultPath;
         string logDateFormat = Environment.GetEnvironmentVariable("LOG_DATE_FORMAT") ?? ILogger.DefaultDateFormat;
-        IFileWriter logWriter = new FileWriter(new ConsoleLogger(LogDomain.Logging, logDateFormat));
+        ILogFormatter logFormatter = new LogFormatter(logDateFormat);
+        ILogger fallbackLogger = new ConsoleLogger(LogDomain.Logging, logFormatter);
+        IFileWriter logWriter = new FileWriter(fallbackLogger);
 
-        return new DefaultLoggerFactory(logFilePath, logDateFormat, logWriter);
+        return new DefaultLoggerFactory(logFormatter, logFilePath, logWriter);
     }
 }
