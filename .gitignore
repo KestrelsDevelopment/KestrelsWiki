@@ -3,3 +3,12 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
+
+.vs/
+.idea/
+
+testFiles/
+logs/
+data/
+*.db
+*.exe
