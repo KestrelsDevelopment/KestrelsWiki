@@ -11,7 +11,10 @@ public class Program
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        MultiLoggerFactory loggerFactory = new("../logs/", "dd/MM/yyyy HH:mm:ss");
+        MultiLoggerFactory loggerFactory = new(
+            Environment.GetEnvironmentVariable("LOG_PATH") ?? ILogger.DefaultPath,
+            Environment.GetEnvironmentVariable("LOG_DATE_FORMAT") ?? ILogger.DefaultDateFormat
+        );
         ILogger logger = loggerFactory.CreateLogger(LogDomain.Startup);
 
         logger.Write("Adding services to container");
