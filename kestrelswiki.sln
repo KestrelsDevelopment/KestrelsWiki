@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kestrelswiki", "kestrelswiki\kestrelswiki.csproj", "{4E62C23E-BFA1-4A2B-8BAD-DEF4DD7140ED}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kestrelswiki.tests", "kestrelswiki.tests\kestrelswiki.tests.csproj", "{74052DD2-B892-468B-BE71-88518F2EF0E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{4E62C23E-BFA1-4A2B-8BAD-DEF4DD7140ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E62C23E-BFA1-4A2B-8BAD-DEF4DD7140ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E62C23E-BFA1-4A2B-8BAD-DEF4DD7140ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74052DD2-B892-468B-BE71-88518F2EF0E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74052DD2-B892-468B-BE71-88518F2EF0E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74052DD2-B892-468B-BE71-88518F2EF0E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74052DD2-B892-468B-BE71-88518F2EF0E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
