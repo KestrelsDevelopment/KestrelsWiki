@@ -2,12 +2,12 @@ namespace kestrelswiki.logging;
 
 public class Try<T>
 {
-    public Try(T result)
+    public Try(T? result)
     {
         Result = result;
     }
 
-    public Try(Exception exception)
+    public Try(Exception? exception)
     {
         Exception = exception;
     }
