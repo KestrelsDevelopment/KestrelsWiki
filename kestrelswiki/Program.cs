@@ -2,6 +2,7 @@ using kestrelswiki.logging.logFormat;
 using kestrelswiki.logging.logger;
 using kestrelswiki.logging.loggerFactory;
 using kestrelswiki.service.file;
+using kestrelswiki.service.webpage;
 using ILogger = kestrelswiki.logging.logger.ILogger;
 using ILoggerFactory = kestrelswiki.logging.loggerFactory.ILoggerFactory;
 
@@ -13,12 +14,18 @@ public class Program
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        ILoggerFactory loggerFactory = InitLoggerFactory();
-        ILogger logger = loggerFactory.CreateLogger(LogDomain.Startup);
+        ILoggerFactory lf = InitLoggerFactory();
+        ILogger logger = lf.Create(LogDomain.Startup);
 
         logger.Write("Adding services to container");
 
-        builder.Services.AddSingleton(loggerFactory);
+        builder.Services.AddSingleton(lf);
+        builder.Services.AddScoped<IFileWriter>(_ => new FileWriter(lf.Create(LogDomain.Files)));
+        builder.Services.AddScoped<IFileReader>(_ => new FileReader(lf.Create(LogDomain.Files)));
+        builder.Services.AddScoped<IWebpageService>(s => new WebpageService(
+            lf.Create(LogDomain.WebpageService),
+            s.GetRequiredService<IFileReader>()
+        ));
         builder.Services.AddControllers();
 
 #if DEBUG

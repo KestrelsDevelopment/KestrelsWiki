@@ -5,5 +5,5 @@ namespace kestrelswiki.logging.loggerFactory;
 
 public interface ILoggerFactory
 {
-    ILogger CreateLogger(LogDomain logDomain);
+    ILogger Create(LogDomain logDomain);
 }

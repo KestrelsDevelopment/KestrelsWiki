@@ -10,7 +10,7 @@ public class DefaultLoggerFactory(
     string logFilePath,
     IFileWriter fileWriter) : ILoggerFactory
 {
-    public ILogger CreateLogger(LogDomain logDomain)
+    public ILogger Create(LogDomain logDomain)
     {
         return new MultiLogger([
             new ConsoleLogger(logDomain, logFormatter),
