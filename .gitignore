@@ -12,3 +12,6 @@ logs/
 data/
 *.db
 *.exe
+
+*.sln.DotSettings
+*.sln.DotSettings.user
