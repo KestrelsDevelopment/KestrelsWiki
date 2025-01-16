@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using CliWrap;
 using kestrelswiki.environment;
 
@@ -5,11 +6,17 @@ namespace kestrelswiki.service.git;
 
 public class GitService(ILogger logger) : IGitService
 {
-    public Try<bool> TryCloneWebPageRepository()
+    public async Task<Try<bool>> TryCloneWebPageRepository()
     {
-        Cli.Wrap("git").WithArguments(["clone"]).WithWorkingDirectory(Variables.ContentPath);
+        string output = string.Empty;
+        CommandTask<CommandResult> commandTask = Cli.Wrap("git")
+            .WithArguments(["clone", Variables.WebPageRepo])
+            .WithWorkingDirectory(Variables.ContentPath)
+            .WithStandardOutputPipe(PipeTarget.ToDelegate(o => output = o))
+            .ExecuteAsync();
 
-        throw new NotImplementedException();
+        CommandResult result = await commandTask.Task;
+        return result.IsSuccess ? new(true) : Try<bool>.Fail(output);
     }
 
     public Try<bool> TryPullContentRepository()

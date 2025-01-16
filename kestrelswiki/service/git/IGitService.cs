@@ -1,8 +1,10 @@
+using System.Threading.Tasks;
+
 namespace kestrelswiki.service.git;
 
 public interface IGitService
 {
-    Try<bool> TryCloneWebPageRepository();
+    Task<Try<bool>> TryCloneWebPageRepository();
 
     Try<bool> TryPullContentRepository();
 }
