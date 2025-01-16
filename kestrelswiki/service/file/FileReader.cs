@@ -7,6 +7,9 @@ public class FileReader(ILogger logger) : IFileReader
 {
     public Try<string> TryReadAllText(string path)
     {
+        if (string.IsNullOrWhiteSpace(path))
+            return new(new ArgumentException("Unable to read file: Path is empty."));
+
         try
         {
             using FileStream stream = File.OpenRead(path);
