@@ -2,6 +2,7 @@ using kestrelswiki.environment;
 using kestrelswiki.logging.logFormat;
 using kestrelswiki.logging.loggerFactory;
 using kestrelswiki.service.file;
+using kestrelswiki.service.git;
 using kestrelswiki.service.webpage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,26 +28,28 @@ public class Program
             lf.Create(LogDomain.WebpageService),
             s.GetRequiredService<IFileReader>()
         ));
+
         builder.Services.AddControllers();
 
-#if DEBUG
         if (builder.Environment.IsDevelopment())
         {
+            builder.Services.AddScoped<IGitService>(_ => new DevGitService(lf.Create(LogDomain.GitService)));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
         }
-#endif
+        else
+        {
+            builder.Services.AddScoped<IGitService>(_ => new GitService(lf.Create(LogDomain.GitService)));
+        }
 
         logger.Write("Building host");
         WebApplication app = builder.Build();
 
-#if DEBUG
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-#endif
 
         app.UseHttpsRedirection();
         app.MapControllers();
