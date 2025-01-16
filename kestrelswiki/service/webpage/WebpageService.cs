@@ -15,7 +15,7 @@ public class WebpageService(ILogger logger, IFileReader fileReader) : IWebpageSe
             : fileReader.TryReadAllText(Path.Combine(_wwwroot, path));
 
         tri.Catch(e => logger.Write(FormatErrorMessage(path, e.Message)));
-        return tri.Success ? new(tri.Result) : new(new Exception(FormatErrorMessage(path, tri.Exception?.Message)));
+        return tri.Success ? new(tri.Result) : Try<string>.Fail(FormatErrorMessage(path, tri.Exception?.Message));
     }
 
     public bool CloneGitRepository(string url)

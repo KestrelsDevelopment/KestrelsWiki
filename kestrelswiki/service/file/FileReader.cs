@@ -20,7 +20,7 @@ public class FileReader(ILogger logger) : IFileReader
         {
             string errorMessage = $"Unable to read file at {path}: {e.Message}";
             logger.Write(errorMessage);
-            return new(new Exception(errorMessage, e));
+            return Try<string>.Fail(errorMessage, e);
         }
     }
 }

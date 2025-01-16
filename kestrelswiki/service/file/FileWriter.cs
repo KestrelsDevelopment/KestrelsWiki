@@ -1,10 +1,11 @@
+using kestrelswiki.logging;
 using ILogger = kestrelswiki.logging.logger.ILogger;
 
 namespace kestrelswiki.service.file;
 
 public class FileWriter(ILogger logger) : IFileWriter
 {
-    public bool Write(string contents, string fileName)
+    public Try<bool> Write(string contents, string fileName)
     {
         try
         {
@@ -15,13 +16,13 @@ public class FileWriter(ILogger logger) : IFileWriter
         catch (Exception e)
         {
             logger.Write(e);
-            return false;
+            return Try<bool>.Fail($"Unable to write file at {fileName}: {e.Message}");
         }
 
-        return true;
+        return new(true);
     }
 
-    public bool WriteLine(string contents, string fileName)
+    public Try<bool> WriteLine(string contents, string fileName)
     {
         return Write(contents + Environment.NewLine, fileName);
     }

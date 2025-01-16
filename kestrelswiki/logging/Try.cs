@@ -16,6 +16,11 @@ public class Try<T>
     public Exception? Exception { get; }
     public bool Success => Exception is null && Result is not null;
 
+    public static Try<T> Fail(string errorMessage, Exception? innerException = null)
+    {
+        return new(new Exception(errorMessage, innerException));
+    }
+
     public Try<T> Then(Action<T> action)
     {
         if (Success && Result is not null) action(Result);
