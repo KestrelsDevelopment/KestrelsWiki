@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using kestrelswiki.environment;
 using kestrelswiki.logging.logFormat;
 using kestrelswiki.service.file;
 
@@ -10,9 +12,8 @@ public class DefaultLoggerFactory(
 {
     public ILogger Create(LogDomain logDomain)
     {
-        return new MultiLogger([
-            new ConsoleLogger(logDomain, logFormatter),
-            new FileLogger(logDomain, logFormatter, logFilePath, fileWriter)
-        ]);
+        List<ILogger> loggers = [new ConsoleLogger(logDomain, logFormatter)];
+        if (Variables.EnableFileLogging) loggers.Add(new FileLogger(logDomain, logFormatter, logFilePath, fileWriter));
+        return new MultiLogger(loggers);
     }
 }

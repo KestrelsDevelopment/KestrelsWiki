@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+
 namespace kestrelswiki.logging.logger;
 
-public class MultiLogger(ILogger[] loggers) : ILogger
+public class MultiLogger(IEnumerable<ILogger> loggers) : ILogger
 {
     public void Write(object message)
     {
-        foreach (var logger in loggers) logger.Write(message);
+        foreach (ILogger logger in loggers) logger.Write(message);
     }
 }
