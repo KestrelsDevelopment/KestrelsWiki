@@ -1,7 +1,5 @@
 using kestrelswiki.logging.logFormat;
-using kestrelswiki.logging.logger;
 using kestrelswiki.service.file;
-using ILogger = kestrelswiki.logging.logger.ILogger;
 
 namespace kestrelswiki.logging.loggerFactory;
 

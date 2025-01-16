@@ -1,10 +1,11 @@
+using kestrelswiki.environment;
 using kestrelswiki.logging.logFormat;
-using kestrelswiki.logging.logger;
 using kestrelswiki.logging.loggerFactory;
 using kestrelswiki.service.file;
 using kestrelswiki.service.webpage;
-using ILogger = kestrelswiki.logging.logger.ILogger;
-using ILoggerFactory = kestrelswiki.logging.loggerFactory.ILoggerFactory;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace kestrelswiki;
 
@@ -55,12 +56,10 @@ public class Program
 
     private static ILoggerFactory InitLoggerFactory()
     {
-        string logFilePath = Environment.GetEnvironmentVariable("LOG_PATH") ?? ILogger.DefaultPath;
-        string logDateFormat = Environment.GetEnvironmentVariable("LOG_DATE_FORMAT") ?? ILogger.DefaultDateFormat;
-        ILogFormatter logFormatter = new LogFormatter(logDateFormat);
+        ILogFormatter logFormatter = new LogFormatter(Variables.LogDateFormat);
         ILogger fallbackLogger = new ConsoleLogger(LogDomain.Logging, logFormatter);
         IFileWriter logWriter = new FileWriter(fallbackLogger);
 
-        return new DefaultLoggerFactory(logFormatter, logFilePath, logWriter);
+        return new DefaultLoggerFactory(logFormatter, Variables.LogPath, logWriter);
     }
 }

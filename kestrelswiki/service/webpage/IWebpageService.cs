@@ -1,5 +1,3 @@
-using kestrelswiki.logging;
-
 namespace kestrelswiki.service.webpage;
 
 public interface IWebpageService

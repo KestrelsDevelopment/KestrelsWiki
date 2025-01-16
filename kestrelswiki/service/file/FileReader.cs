@@ -1,6 +1,3 @@
-using kestrelswiki.logging;
-using ILogger = kestrelswiki.logging.logger.ILogger;
-
 namespace kestrelswiki.service.file;
 
 public class FileReader(ILogger logger) : IFileReader
