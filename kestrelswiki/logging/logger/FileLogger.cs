@@ -11,6 +11,7 @@ public class FileLogger(
 {
     public void Write(object message)
     {
-        fileWriter.WriteLine(logFormatter.Format(logDomain, message), logFilePath);
+        fileWriter.WriteLine(logFormatter.Format(logDomain, message),
+            Path.Combine(logFilePath, DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".log"));
     }
 }
