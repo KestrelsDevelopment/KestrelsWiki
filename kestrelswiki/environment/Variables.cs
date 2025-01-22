@@ -12,6 +12,9 @@ public static class Variables
     public static readonly string
         WebPageRepo = Environment.GetEnvironmentVariable("WEBPAGE_REPOSITORY") ?? string.Empty;
 
+    public static readonly string
+        ContentRepository = Environment.GetEnvironmentVariable("CONTENT_REPOSITORY") ?? string.Empty;
+
     public static readonly string LogDateFormat =
         Environment.GetEnvironmentVariable("LOG_DATE_FORMAT") ?? ILogger.DefaultDateFormat;
 }

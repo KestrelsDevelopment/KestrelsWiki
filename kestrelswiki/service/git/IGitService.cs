@@ -4,7 +4,7 @@ namespace kestrelswiki.service.git;
 
 public interface IGitService
 {
-    Task<Try<bool>> TryCloneWebPageRepository();
+    Task<Try<bool>> TryCloneWebPageRepositoryAsync();
 
-    Try<bool> TryPullContentRepository();
+    Task<Try<bool>> TryPullContentRepositoryAsync();
 }

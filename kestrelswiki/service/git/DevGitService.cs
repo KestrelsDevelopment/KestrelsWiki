@@ -4,15 +4,15 @@ namespace kestrelswiki.service.git;
 
 public class DevGitService(ILogger logger) : IGitService
 {
-    public async Task<Try<bool>> TryCloneWebPageRepository()
+    public async Task<Try<bool>> TryCloneWebPageRepositoryAsync()
     {
-        logger.Write("Cloning Web Page Repository.");
+        logger.Write("Running git clone for webpage repository");
         return new(true);
     }
 
-    public Try<bool> TryPullContentRepository()
+    public async Task<Try<bool>> TryPullContentRepositoryAsync()
     {
-        logger.Write("Pulling Content Repository.");
+        logger.Write("Running git pull for content repository");
         return new(true);
     }
 }
