@@ -23,4 +23,19 @@ public class FileWriter(ILogger logger) : IFileWriter
     {
         return Write(contents + Environment.NewLine, fileName);
     }
+
+    public Try<bool> CreateDirectory(string directoryName)
+    {
+        try
+        {
+            Directory.CreateDirectory(directoryName);
+        }
+        catch (Exception e)
+        {
+            logger.Write(e);
+            return Try<bool>.Fail(e.Message, e);
+        }
+
+        return new(true);
+    }
 }

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using kestrelswiki.environment;
 using kestrelswiki.logging.logFormat;
 using kestrelswiki.logging.loggerFactory;
@@ -12,7 +13,7 @@ namespace kestrelswiki;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -31,15 +32,14 @@ public class Program
 
         builder.Services.AddControllers();
 
+        builder.Services.AddScoped<IGitService>(builder.Environment.IsDevelopment()
+            ? _ => new DevGitService(lf.Create(LogDomain.GitService))
+            : s => new GitService(lf.Create(LogDomain.GitService), s.GetRequiredService<IFileWriter>()));
+
         if (builder.Environment.IsDevelopment())
         {
-            builder.Services.AddScoped<IGitService>(_ => new DevGitService(lf.Create(LogDomain.GitService)));
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-        }
-        else
-        {
-            builder.Services.AddScoped<IGitService>(_ => new GitService(lf.Create(LogDomain.GitService)));
         }
 
         logger.Write("Building host");
@@ -54,7 +54,14 @@ public class Program
         app.UseHttpsRedirection();
         app.MapControllers();
 
-        app.Run();
+        using (IServiceScope scope = app.Services.CreateScope())
+        {
+            IGitService gitService = scope.ServiceProvider.GetRequiredService<IGitService>();
+            await gitService.TryCloneWebPageRepositoryAsync();
+            await gitService.TryPullContentRepositoryAsync();
+        }
+
+        await app.RunAsync();
     }
 
     private static ILoggerFactory InitLoggerFactory()
