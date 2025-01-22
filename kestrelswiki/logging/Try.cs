@@ -36,4 +36,9 @@ public class Try<T>
             );
         return this;
     }
+
+    public T ResultOrDefault(T defaultValue)
+    {
+        return Success ? Result ?? defaultValue : defaultValue;
+    }
 }

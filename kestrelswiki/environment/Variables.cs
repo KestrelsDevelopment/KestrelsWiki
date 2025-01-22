@@ -23,4 +23,18 @@ public static class Variables
 
     public static readonly string LogDateFormat =
         Environment.GetEnvironmentVariable("LOG_DATE_FORMAT") ?? ILogger.DefaultDateFormat;
+
+    public static class Webpage
+    {
+        public static readonly string HomeDirectory = Environment.GetEnvironmentVariable("HOME_DIR") ?? "home";
+
+        public static readonly string FrontpageDirectory =
+            Environment.GetEnvironmentVariable("FRONTPAGE_DIR") ?? "frontpage";
+
+        public static readonly string ArticleDirectory =
+            Environment.GetEnvironmentVariable("ARTICLE_DIR") ?? "article";
+
+        public static readonly string NotFoundDirectory =
+            Environment.GetEnvironmentVariable("NOT_FOUND_DIR") ?? "not-found";
+    }
 }

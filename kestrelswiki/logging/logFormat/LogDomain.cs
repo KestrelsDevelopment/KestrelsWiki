@@ -7,5 +7,6 @@ public record LogDomain(string Name)
     public static readonly LogDomain Files = new("Files");
     public static readonly LogDomain WebpageService = new("WebpageService");
     public static readonly LogDomain GitService = new("GitService");
+    public static readonly LogDomain WebpageController = new("WebpageController");
     public static readonly LogDomain Testing = new("Testing");
 }
