@@ -7,9 +7,8 @@ riderModule.iml
 .vs/
 .idea/
 
-testFiles/
-logs/
-data/
+wwwroot/
+content/
 *.db
 *.exe
 
