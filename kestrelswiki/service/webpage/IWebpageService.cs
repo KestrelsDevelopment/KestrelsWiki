@@ -1,7 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace kestrelswiki.service.webpage;
 
 public interface IWebpageService
 {
-    Try<string> TryGetWebpage(string path);
-    bool CloneGitRepository(string url);
+    Try<PhysicalFileResult> TryGetFile(string path);
 }

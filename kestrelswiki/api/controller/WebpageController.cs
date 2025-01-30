@@ -1,20 +1,17 @@
-using System.Net.Mime;
 using kestrelswiki.environment;
 using kestrelswiki.logging.logFormat;
 using kestrelswiki.logging.loggerFactory;
 using kestrelswiki.service.article;
-using kestrelswiki.service.file;
+using kestrelswiki.service.webpage;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.StaticFiles;
 
 namespace kestrelswiki.api.controller;
 
 [ApiController]
 public class WebpageController(
     ILoggerFactory loggerFactory,
-    IContentTypeProvider contentTypeProvider,
     IArticleService articleService,
-    IFileReader fileReader)
+    IWebpageService webpageService)
     : KestrelsController(loggerFactory, LogDomain.WebpageController)
 {
     protected WebpageInfo ArticlePage = new(Variables.Webpage.ArticleDirectory);
@@ -28,7 +25,7 @@ public class WebpageController(
     [HttpGet("")]
     public ActionResult GetHomepage()
     {
-        return GetFile(HomePage.HtmlPath) ?? GetNotFoundPage();
+        return File(HomePage.HtmlPath) ?? GetNotFoundPage();
     }
 
     /// <summary>
@@ -37,7 +34,7 @@ public class WebpageController(
     [HttpGet("{*path}")]
     public ActionResult GetHomepageFile(string path)
     {
-        return GetFile(Path.Combine(HomePage.DirPath, path)) ?? GetNotFoundPage();
+        return File(Path.Combine(HomePage.DirPath, path)) ?? GetNotFoundPage();
     }
 
     /// <summary>
@@ -46,7 +43,7 @@ public class WebpageController(
     [HttpGet("wiki")]
     public ActionResult GetWikiFrontpage()
     {
-        return GetFile(FrontPage.HtmlPath) ?? GetNotFoundPage();
+        return File(FrontPage.HtmlPath) ?? GetNotFoundPage();
     }
 
     /// <summary>
@@ -58,9 +55,9 @@ public class WebpageController(
     [HttpGet("wiki/{*path}")]
     public ActionResult GetWikiArticlePage(string path)
     {
-        return GetFile(Path.Combine(FrontPage.DirPath, path))
-               ?? GetFile(Path.Combine(ArticlePage.DirPath, path))
-               ?? (articleService.Exists(path) ? GetFile(ArticlePage.HtmlPath) : GetNotFoundPage())
+        return File(Path.Combine(FrontPage.DirPath, path))
+               ?? File(Path.Combine(ArticlePage.DirPath, path))
+               ?? (articleService.Exists(path) ? File(ArticlePage.HtmlPath) : GetNotFoundPage())
                ?? GetNotFoundPage();
     }
 
@@ -71,7 +68,7 @@ public class WebpageController(
     [HttpGet("global/{*path}")]
     public ActionResult GetGlobalFile(string path)
     {
-        return GetFile(Path.Combine(
+        return File(Path.Combine(
             Directory.GetCurrentDirectory(),
             Variables.WebRootPath,
             Variables.Webpage.GlobalFileDirectory,
@@ -79,17 +76,14 @@ public class WebpageController(
         ) ?? GetNotFoundPage();
     }
 
-    protected ActionResult? GetFile(string physicalPath)
+    protected ActionResult? File(string physicalPath)
     {
-        if (!fileReader.Exists(physicalPath).Result) return null;
-        contentTypeProvider.TryGetContentType(physicalPath, out string? contentType);
-        PhysicalFileResult result = PhysicalFile(physicalPath, contentType ?? MediaTypeNames.Text.Plain);
-        return result;
+        return webpageService.TryGetFile(physicalPath).Result;
     }
 
     protected ActionResult GetNotFoundPage()
     {
-        return GetFile(NotFoundPage.HtmlPath) ?? NotFound();
+        return File(NotFoundPage.HtmlPath) ?? NotFound();
     }
 
     protected class WebpageInfo(string dirPath)

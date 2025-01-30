@@ -5,6 +5,7 @@ using kestrelswiki.logging.loggerFactory;
 using kestrelswiki.service.article;
 using kestrelswiki.service.file;
 using kestrelswiki.service.git;
+using kestrelswiki.service.webpage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +32,11 @@ public class Program
             s.GetRequiredService<IFileReader>()
         ));
         builder.Services.AddScoped<IContentTypeProvider, FileExtensionContentTypeProvider>();
+        builder.Services.AddScoped<IWebpageService>(s => new WebpageService(
+            lf.Create(LogDomain.WebpageService),
+            s.GetRequiredService<IFileReader>(),
+            s.GetRequiredService<IContentTypeProvider>()
+        ));
 
         builder.Services.AddControllers();
 
