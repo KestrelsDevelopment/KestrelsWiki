@@ -26,15 +26,18 @@ public static class Variables
 
     public static class Webpage
     {
-        public static readonly string HomeDirectory = Environment.GetEnvironmentVariable("HOME_DIR") ?? "home";
+        public static readonly string HomeDirectory = Environment.GetEnvironmentVariable("HOME_DIR") ?? "homepage";
 
         public static readonly string FrontpageDirectory =
-            Environment.GetEnvironmentVariable("FRONTPAGE_DIR") ?? "frontpage";
+            Environment.GetEnvironmentVariable("FRONTPAGE_DIR") ?? "wikifrontpage";
 
         public static readonly string ArticleDirectory =
-            Environment.GetEnvironmentVariable("ARTICLE_DIR") ?? "article";
+            Environment.GetEnvironmentVariable("ARTICLE_DIR") ?? "wikiarticle";
 
         public static readonly string NotFoundDirectory =
-            Environment.GetEnvironmentVariable("NOT_FOUND_DIR") ?? "not-found";
+            Environment.GetEnvironmentVariable("NOT_FOUND_DIR") ?? "error";
+
+        public static readonly string GlobalFileDirectory =
+            Environment.GetEnvironmentVariable("GLOBAL_DIR") ?? "global";
     }
 }

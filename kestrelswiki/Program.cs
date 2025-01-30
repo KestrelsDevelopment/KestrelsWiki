@@ -2,10 +2,11 @@ using System.Threading.Tasks;
 using kestrelswiki.environment;
 using kestrelswiki.logging.logFormat;
 using kestrelswiki.logging.loggerFactory;
+using kestrelswiki.service.article;
 using kestrelswiki.service.file;
 using kestrelswiki.service.git;
-using kestrelswiki.service.webpage;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -25,10 +26,11 @@ public class Program
         builder.Services.AddSingleton(lf);
         builder.Services.AddScoped<IFileWriter>(_ => new FileWriter(lf.Create(LogDomain.Files)));
         builder.Services.AddScoped<IFileReader>(_ => new FileReader(lf.Create(LogDomain.Files)));
-        builder.Services.AddScoped<IWebpageService>(s => new WebpageService(
+        builder.Services.AddScoped<IArticleService>(s => new ArticleService(
             lf.Create(LogDomain.WebpageService),
             s.GetRequiredService<IFileReader>()
         ));
+        builder.Services.AddScoped<IContentTypeProvider, FileExtensionContentTypeProvider>();
 
         builder.Services.AddControllers();
 
@@ -36,28 +38,14 @@ public class Program
             ? _ => new DevGitService(lf.Create(LogDomain.GitService))
             : s => new GitService(lf.Create(LogDomain.GitService), s.GetRequiredService<IFileWriter>()));
 
-        if (builder.Environment.IsDevelopment())
-        {
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-        }
-
         logger.Write("Building host");
         WebApplication app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-        }
-
-        app.UseHttpsRedirection();
         app.MapControllers();
 
         using (IServiceScope scope = app.Services.CreateScope())
         {
             IGitService gitService = scope.ServiceProvider.GetRequiredService<IGitService>();
-            await gitService.TryCloneWebPageRepositoryAsync();
             await gitService.TryPullContentRepositoryAsync();
         }
 
