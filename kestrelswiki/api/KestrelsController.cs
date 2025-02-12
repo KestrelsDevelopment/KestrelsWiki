@@ -30,8 +30,7 @@ public abstract class KestrelsController(ILoggerFactory loggerFactory, LogDomain
 
     protected void LogIncomingRequest(string message = "", LogLevel logLevel = LogLevel.Information)
     {
-        logger.Write(
-            $"{Request.Method} ({ClientIp}): {Request.Path}{Request.QueryString} {(message.IsNullOrWhiteSpace() ? "" : $" - {message}")}",
-            logLevel);
+        logger.Write(logLevel,
+            $"{Request.Method} ({ClientIp}): {Request.Path}{Request.QueryString} {(message.IsNullOrWhiteSpace() ? "" : $" - {message}")}");
     }
 }

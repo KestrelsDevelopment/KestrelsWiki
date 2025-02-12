@@ -6,13 +6,13 @@ public class DevGitService(ILogger logger) : IGitService
 {
     public async Task<Try<bool>> TryCloneWebPageRepositoryAsync()
     {
-        logger.Write("Running git clone for webpage repository");
+        logger.Info("Running git clone for webpage repository");
         return new(true);
     }
 
     public async Task<Try<bool>> TryPullContentRepositoryAsync()
     {
-        logger.Write("Running git pull for content repository");
+        logger.Info("Running git pull for content repository");
         return new(true);
     }
 }

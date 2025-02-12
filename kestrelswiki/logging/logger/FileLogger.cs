@@ -11,7 +11,7 @@ public class FileLogger(
     string logFilePath,
     IFileWriter fileWriter) : ILogger
 {
-    public void Write(object message, LogLevel logLevel)
+    public void Write(LogLevel logLevel, params object[] message)
     {
         if (logLevel < Variables.LogLevel) return;
         if (Variables.DisabledLogDomains.Contains(logDomain.Name)) return;

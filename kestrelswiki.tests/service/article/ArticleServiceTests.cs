@@ -69,7 +69,7 @@ public class ArticleServiceTests
             .Returns(new Try<IEnumerable<Article>>([], new AggregateException([new(), new()])));
         _articleService.RebuildIndex();
 
-        _loggerMock.Verify(s => s.Write(Any.String, It.IsAny<LogLevel>()), Times.Exactly(2));
+        _loggerMock.Verify(s => s.Write(It.IsAny<LogLevel>(), Any.String), Times.Exactly(2));
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class ArticleServiceTests
             .Returns(new Try<IEnumerable<Article>>([], new()));
         _articleService.RebuildIndex();
 
-        _loggerMock.Verify(s => s.Write(Any.String, It.IsAny<LogLevel>()), Times.Once);
+        _loggerMock.Verify(s => s.Write(It.IsAny<LogLevel>(), Any.String), Times.Once);
     }
 
     [Test]

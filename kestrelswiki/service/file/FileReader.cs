@@ -27,7 +27,7 @@ public class FileReader(ILogger logger) : IFileReader
         catch (Exception e)
         {
             string errorMessage = $"Unable to read file at {file.FullName}: {e.Message}";
-            logger.Write(errorMessage);
+            logger.Error(errorMessage);
             return Try<string>.Fail(errorMessage, e);
         }
     }

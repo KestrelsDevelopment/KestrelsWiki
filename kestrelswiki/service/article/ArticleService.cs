@@ -28,9 +28,9 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
             .Catch<AggregateException>(exception =>
             {
                 foreach (Exception ex in exception.InnerExceptions)
-                    logger.Write(ex.Message);
+                    logger.Error(ex.Message);
             })
-            .Catch(exception => { logger.Write(exception.Message); });
+            .Catch(exception => { logger.Error(exception.Message); });
 
         return new(tri.Result is not null, new AggregateException(exceptions));
     }

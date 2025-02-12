@@ -6,7 +6,7 @@ namespace kestrelswiki.logging.logger;
 
 public class ConsoleLogger(LogDomain logDomain, ILogFormatter logFormatter) : ILogger
 {
-    public void Write(object message, LogLevel logLevel)
+    public void Write(LogLevel logLevel, params object[] message)
     {
         if (logLevel < Variables.LogLevel) return;
         if (Variables.DisabledLogDomains.Contains(logDomain.Name)) return;

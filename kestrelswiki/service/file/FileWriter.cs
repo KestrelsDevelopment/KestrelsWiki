@@ -12,7 +12,7 @@ public class FileWriter(ILogger logger) : IFileWriter
         }
         catch (Exception e)
         {
-            logger.Write(e);
+            logger.Error(e);
             return Try<bool>.Fail($"Unable to write file at {fileName}: {e.Message}");
         }
 
@@ -32,7 +32,7 @@ public class FileWriter(ILogger logger) : IFileWriter
         }
         catch (Exception e)
         {
-            logger.Write(e);
+            logger.Error(e);
             return Try<bool>.Fail(e.Message, e);
         }
 

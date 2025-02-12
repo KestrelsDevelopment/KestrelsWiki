@@ -18,7 +18,7 @@ public class LogFormatterTests
         string expectedResult =
             $"{DateTime.Now.ToString(dateFormat)} [{logDomain.Name}{LogLevel.Information.DisplayName()}] {logMessage}";
 
-        string result = formatter.Format(logDomain, LogLevel.Information, logMessage);
+        string result = formatter.Format(logDomain, LogLevel.Information, [logMessage]);
 
         Assert.That(result, Is.EqualTo(expectedResult));
     }

@@ -3,7 +3,6 @@ using kestrelswiki.logging.logFormat;
 using kestrelswiki.service.article;
 using kestrelswiki.service.webpage;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using ILoggerFactory = kestrelswiki.logging.loggerFactory.ILoggerFactory;
 
 namespace kestrelswiki.api.controller;
@@ -29,7 +28,6 @@ public class WebpageController(
         if (!Variables.EnableWebpageApi) return NotFound();
 
         LogIncomingRequest();
-        // logger.Write("GET at /");
         return File(homePage.HtmlPath) ?? GetNotFoundPage();
     }
 
@@ -95,14 +93,14 @@ public class WebpageController(
     protected ActionResult? File(string physicalPath)
     {
         ActionResult? result = webpageService.TryGetFile(physicalPath).Result;
-        if (result != null) logger.Write($"Returning file at {physicalPath}", LogLevel.Debug);
+        if (result != null) logger.Debug($"Returning file at {physicalPath}");
         return result;
     }
 
     protected ActionResult GetNotFoundPage()
     {
         ActionResult? result = File(notFoundPage.HtmlPath);
-        if (result == null) logger.Write("Not found page not found!");
+        if (result == null) logger.Info("Not found page not found!");
         return result ?? NotFound();
     }
 

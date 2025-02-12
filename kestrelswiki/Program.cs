@@ -23,7 +23,7 @@ public class Program
         ILoggerFactory lf = InitLoggerFactory();
         ILogger logger = lf.Create(LogDomain.Startup);
 
-        logger.Write("Adding services to container");
+        logger.Info("Adding services to container");
 
         builder.Services.AddSingleton(lf);
         builder.Services.AddScoped<IFileWriter>(_ => new FileWriter(lf.Create(LogDomain.Files)));
@@ -47,7 +47,7 @@ public class Program
             ? _ => new DevGitService(lf.Create(LogDomain.GitService))
             : s => new GitService(lf.Create(LogDomain.GitService), s.GetRequiredService<IFileWriter>()));
 
-        logger.Write("Building host");
+        logger.Info("Building host");
         WebApplication app = builder.Build();
 
         app.UseForwardedHeaders(new()
