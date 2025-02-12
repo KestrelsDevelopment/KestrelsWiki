@@ -12,14 +12,14 @@ public class ArticleStore(ILogger logger) : IArticleStore
     public Article? Get(string path)
     {
         if (_articles.TryGetValue(path, out Article? article))
-            logger.Write($"Retrieved article: {article.Title} at {article.Path}", LogLevel.Debug);
+            logger.Write($"Retrieved article: {article.Meta.Title} at {article.Path}", LogLevel.Debug);
         return article;
     }
 
     public bool Set(Article article)
     {
         _articles[article.Path] = article;
-        logger.Write($"Added article: {article.Title} at {article.Path}");
+        logger.Write($"Added article: {article.Meta.Title} at {article.Path}");
         return true;
     }
 

@@ -1,17 +1,14 @@
+using System.Collections.Generic;
+
 namespace kestrelswiki.models;
 
 public class Article
 {
-    public Article(string path, string title, string content)
-    {
-        Path = path;
-        Title = title;
-        Content = content;
-    }
+    protected FileInfo? file;
+    public string Path { get; init; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public ArticleMeta Meta { get; set; } = new();
+    public IEnumerable<Heading> Headings { get; set; } = [];
 
-    public string Path { get; private set; }
-
-    public string Title { get; private set; }
-
-    public string Content { get; private set; }
+    public FileInfo? File => file ??= new(Path);
 }

@@ -20,7 +20,7 @@ public class ArticleStoreTests
     [Test]
     public void Set_SetsValueMappedToPath_GetWorks()
     {
-        Article value = new("path", "title", "content");
+        Article value = new();
 
         _articleStore.Set(value);
         Article? get = _articleStore.Get(value.Path);
@@ -32,7 +32,7 @@ public class ArticleStoreTests
     [Test]
     public void Reset_ClearsStore()
     {
-        Article value = new("path", "title", "content");
+        Article value = new();
         _articleStore.Set(value);
 
         _articleStore.Reset();

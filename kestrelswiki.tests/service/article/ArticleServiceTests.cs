@@ -36,7 +36,7 @@ public class ArticleServiceTests
     [Test]
     public void Exists_ArticleExists_ReturnTrue()
     {
-        _articleStoreMock.Setup(s => s.Get(Any.String)).Returns(new Article("", "", ""));
+        _articleStoreMock.Setup(s => s.Get(Any.String)).Returns(new Article());
 
         bool exists = _articleService.Exists("path");
 
@@ -56,7 +56,7 @@ public class ArticleServiceTests
     [Test]
     public void RebuildIndex_FetchesListOfArticles()
     {
-        _fileReaderMock.Setup(s => s.GetMarkdownFiles(Any.String)).Returns(new Try<IEnumerable<FileInfo>>([]));
+        _fileReaderMock.Setup(s => s.GetMarkdownFiles(Any.String)).Returns(new Try<IEnumerable<Article>>([]));
         _articleService.RebuildIndex();
 
         _fileReaderMock.Verify(s => s.GetMarkdownFiles(Any.String), Times.AtLeastOnce);
@@ -66,7 +66,7 @@ public class ArticleServiceTests
     public void RebuildIndex_AggregateException_LogsErrors()
     {
         _fileReaderMock.Setup(s => s.GetMarkdownFiles(Any.String))
-            .Returns(new Try<IEnumerable<FileInfo>>([], new AggregateException([new(), new()])));
+            .Returns(new Try<IEnumerable<Article>>([], new AggregateException([new(), new()])));
         _articleService.RebuildIndex();
 
         _loggerMock.Verify(s => s.Write(Any.String, It.IsAny<LogLevel>()), Times.Exactly(2));
@@ -76,7 +76,7 @@ public class ArticleServiceTests
     public void RebuildIndex_SingleException_LogsErrors()
     {
         _fileReaderMock.Setup(s => s.GetMarkdownFiles(Any.String))
-            .Returns(new Try<IEnumerable<FileInfo>>([], new()));
+            .Returns(new Try<IEnumerable<Article>>([], new()));
         _articleService.RebuildIndex();
 
         _loggerMock.Verify(s => s.Write(Any.String, It.IsAny<LogLevel>()), Times.Once);
@@ -95,7 +95,7 @@ public class ArticleServiceTests
     protected class ExposedArticleService(ILogger logger, IFileReader fileReader, IArticleStore store)
         : ArticleService(logger, fileReader, store)
     {
-        public new Try<bool> AddToIndex(FileInfo file)
+        public new Try<bool> AddToIndex(Article file)
         {
             return base.AddToIndex(file);
         }

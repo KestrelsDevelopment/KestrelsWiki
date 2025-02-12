@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using kestrelswiki.models;
 
 namespace kestrelswiki.service.file;
 
@@ -32,17 +33,20 @@ public class FileReader(ILogger logger) : IFileReader
     }
 
     // TODO: Don't do this recursively
-    public Try<IEnumerable<FileInfo>> GetMarkdownFiles(string path)
+    public Try<IEnumerable<Article>> GetMarkdownFiles(string path)
     {
         DirectoryInfo directory = new(path);
         if (!directory.Exists) return new([]);
 
-        List<FileInfo> files = directory.GetFiles("*.md").ToList();
+        List<Article> files = directory.GetFiles("*.md").Select(f => new Article
+        {
+            Path = f.FullName // should be relative path from content root
+        }).ToList();
         List<Exception> exceptions = [];
 
         foreach (DirectoryInfo subDir in directory.GetDirectories().ToList().FindAll(d => d.Name != ".git"))
         {
-            Try<IEnumerable<FileInfo>> tri = GetMarkdownFiles(subDir.FullName);
+            Try<IEnumerable<Article>> tri = GetMarkdownFiles(subDir.FullName);
             if (tri.Result is not null) files.AddRange(tri.Result ?? []);
 
             switch (tri.Exception)

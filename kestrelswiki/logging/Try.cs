@@ -28,9 +28,14 @@ public class Try<T>
         return this;
     }
 
+    public Try<T> Catch<TEx>(Action<TEx> action) where TEx : Exception
+    {
+        if (Exception is TEx tex) action(tex);
+        return this;
+    }
+
     public Try<T> Catch(Action<Exception> action)
     {
-        if (Exception is not null) action(Exception);
-        return this;
+        return Catch<Exception>(action);
     }
 }
