@@ -28,6 +28,11 @@ public abstract class KestrelsController(ILoggerFactory loggerFactory, LogDomain
         }
     }
 
+    protected StatusCodeResult StatusCode(HttpStatusCode statusCode)
+    {
+        return new((int)statusCode);
+    }
+
     protected void LogIncomingRequest(string message = "", LogLevel logLevel = LogLevel.Information)
     {
         logger.Write(logLevel,
