@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using kestrelswiki.environment;
 using kestrelswiki.extensions;
 using kestrelswiki.models;
 
@@ -33,46 +34,40 @@ public class FileReader(ILogger logger) : IFileReader
         }
     }
 
-    // TODO: Don't do this recursively
-    public Try<IEnumerable<Article>> GetMarkdownFiles(string path)
+    public Try<IEnumerable<Article>> GetMarkdownFiles()
     {
-        DirectoryInfo directory = new(path);
-        if (!directory.Exists) return new([]);
+        Stack<DirectoryInfo> directories = new();
+        directories.Push(new(Variables.ContentPath));
+
+        int contentPathLength = Path.GetFullPath(Variables.ContentPath).Length;
 
         List<Exception> exceptions = [];
-        List<Article> files = directory
-            .GetFiles("*.md")
-            .Select(f =>
-            {
-                Try<string> fileContent = TryReadAllText(f.FullName).Catch(ex => exceptions.Add(ex));
-                return new Article
-                {
-                    Path = f.FullName, // should be relative path from content root
-                    Content = fileContent.Result ?? string.Empty
-                };
-            })
-            .Where(a => !a.Content.IsNullOrWhiteSpace())
-            .ToList();
+        List<Article> articles = [];
 
-        foreach (DirectoryInfo subDir in directory.GetDirectories().ToList().FindAll(d => d.Name != ".git"))
+        while (directories.Count > 0)
         {
-            Try<IEnumerable<Article>> tri = GetMarkdownFiles(subDir.FullName);
-            if (tri.Result is not null) files.AddRange(tri.Result ?? []);
+            DirectoryInfo directory = directories.Pop();
+            if (!directory.Exists) continue;
 
-            switch (tri.Exception)
-            {
-                case null:
-                    break;
-                case AggregateException aggEx:
-                    exceptions.AddRange(aggEx.InnerExceptions);
-                    break;
-                default:
-                    exceptions.Add(tri.Exception);
-                    break;
-            }
+            articles.AddRange(directory.GetFiles("*.md")
+                .Where(f => !f.Name.StartsWith('.'))
+                .Select(f =>
+                {
+                    Try<string> fileContent = TryReadAllText(f.FullName).Catch(ex => exceptions.Add(ex));
+                    return new Article
+                    {
+                        Path = f.FullName[contentPathLength..].Replace(Path.DirectorySeparatorChar, '/'),
+                        Content = fileContent.Result ?? string.Empty
+                    };
+                })
+                .Where(a => !a.Content.IsNullOrWhiteSpace()));
+
+            directory.GetDirectories()
+                .Where(subDir => !subDir.Name.StartsWith('.'))
+                .ForEach(directories.Push);
         }
 
-        return new(files, new AggregateException(exceptions));
+        return new(articles, exceptions.Count > 0 ? new AggregateException(exceptions) : null);
     }
 
     public Try<bool> Exists(string path)

@@ -16,7 +16,7 @@ public interface IFileReader
     Try<string> TryReadAllText(FileInfo file);
 
     /// <returns>An IEnumerable of FileInfos referring to .md files in the given directory and all subdirectories.</returns>
-    Try<IEnumerable<Article>> GetMarkdownFiles(string path);
+    Try<IEnumerable<Article>> GetMarkdownFiles();
 
     Try<bool> Exists(string path);
 }

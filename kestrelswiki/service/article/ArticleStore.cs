@@ -10,15 +10,16 @@ public class ArticleStore(ILogger logger) : IArticleStore
 
     public Article? Get(string path)
     {
+        if (!path.StartsWith('/')) path = "/" + path;
         if (_articles.TryGetValue(path, out Article? article))
-            logger.Debug($"Retrieved article: {article.Meta.Title} at {article.Path}");
+            logger.Debug($"Retrieved article: \"{article.Meta.Title}\" at {article.Path}");
         return article;
     }
 
     public bool Set(Article article)
     {
         _articles[article.Path] = article;
-        logger.Info("Added article:", article);
+        logger.Debug($"Saved article: \"{article.Meta.Title}\" at {article.Path}");
         return true;
     }
 

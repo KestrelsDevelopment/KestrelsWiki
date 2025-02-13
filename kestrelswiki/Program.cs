@@ -60,11 +60,8 @@ public class Program
 
         using (IServiceScope scope = app.Services.CreateScope())
         {
-            IGitService gitService = scope.ServiceProvider.GetRequiredService<IGitService>();
-            await gitService.TryPullContentRepositoryAsync();
-
-            IArticleService articleService = scope.ServiceProvider.GetRequiredService<IArticleService>();
-            articleService.RebuildIndex();
+            await scope.ServiceProvider.GetRequiredService<IGitService>().TryPullContentRepositoryAsync();
+            scope.ServiceProvider.GetRequiredService<IArticleService>().RebuildIndex();
         }
 
         await app.RunAsync();

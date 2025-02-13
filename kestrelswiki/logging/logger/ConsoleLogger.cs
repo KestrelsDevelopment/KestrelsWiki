@@ -10,6 +10,7 @@ public class ConsoleLogger(LogDomain logDomain, ILogFormatter logFormatter) : IL
     {
         if (logLevel < Variables.LogLevel) return;
         if (Variables.DisabledLogDomains.Contains(logDomain.Name)) return;
-        Console.WriteLine(logFormatter.Format(logDomain, logLevel, message));
+        string formattedMessage = logFormatter.Format(logDomain, logLevel, message);
+        Console.WriteLine(formattedMessage);
     }
 }

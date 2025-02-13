@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using kestrelswiki.environment;
 using kestrelswiki.extensions;
 using kestrelswiki.models;
 using kestrelswiki.service.file;
@@ -18,14 +17,13 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
 
     public Try<bool> RebuildIndex()
     {
+        logger.Info("Rebuilding index");
         List<Exception> exceptions = [];
 
         Try<IEnumerable<Article>> tri = fileReader
-            .GetMarkdownFiles(Variables.ContentPath)
+            .GetMarkdownFiles()
             .Then(result => result.ForEach(article => AddToIndex(article).Catch(exceptions.Add)))
-            .Catch<AggregateException>(exception =>
-                exception.InnerExceptions.ForEach(ex => logger.Error(ex.Message))
-            )
+            .Catch<AggregateException>(exception => exception.InnerExceptions.ForEach(ex => logger.Error(ex.Message)))
             .Catch(exception => logger.Error(exception.Message));
 
         return new(tri.Result is not null, new AggregateException(exceptions));
@@ -41,7 +39,14 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
             })
             .Catch(ex => logger.Trace(ex));
 
-        Try<IEnumerable<Heading>> headings = ExtractHeadings(article.Content).Catch(ex => logger.Trace(ex));
+        Try<IEnumerable<Heading>> headings = ExtractHeadings(article.Content)
+            .Then(result =>
+            {
+                Heading[] headings = result as Heading[] ?? result.ToArray();
+                article.Headings = headings;
+                article.Meta.Title = headings[0].Name;
+            })
+            .Catch(ex => logger.Trace(ex));
         if (!headings.Success) return new(new("Title could not be found", headings.Exception));
 
         article.Content = RenderMarkdown(article.Content);
@@ -73,13 +78,14 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
         if (!content.StartsWith("# ")) return new(new("No title found"));
 
         List<Heading> result = [];
-        string[] lines = content.Split('\n');
+        string[] lines = content.Split(Environment.NewLine);
 
         lines.Where(line =>
-                (line.StartsWith("# ") && result.Count == 0)
-                || line.StartsWith("## ")
-                || line.StartsWith("### "))
-            .ForEach(line => result.Add(new() { Name = line[1..] }));
+                line.Length > 2 &&
+                ((line.StartsWith("# ") && result.Count == 0)
+                 || line.StartsWith("## ")
+                 || line.StartsWith("### ")))
+            .ForEach(line => result.Add(new() { Name = line[2..] }));
 
         return new(result);
     }

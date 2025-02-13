@@ -56,16 +56,16 @@ public class ArticleServiceTests
     [Test]
     public void RebuildIndex_FetchesListOfArticles()
     {
-        _fileReaderMock.Setup(s => s.GetMarkdownFiles(Any.String)).Returns(new Try<IEnumerable<Article>>([]));
+        _fileReaderMock.Setup(s => s.GetMarkdownFiles()).Returns(new Try<IEnumerable<Article>>([]));
         _articleService.RebuildIndex();
 
-        _fileReaderMock.Verify(s => s.GetMarkdownFiles(Any.String), Times.AtLeastOnce);
+        _fileReaderMock.Verify(s => s.GetMarkdownFiles(), Times.AtLeastOnce);
     }
 
     [Test]
     public void RebuildIndex_AggregateException_LogsErrors()
     {
-        _fileReaderMock.Setup(s => s.GetMarkdownFiles(Any.String))
+        _fileReaderMock.Setup(s => s.GetMarkdownFiles())
             .Returns(new Try<IEnumerable<Article>>([], new AggregateException([new(), new()])));
         _articleService.RebuildIndex();
 
@@ -75,7 +75,7 @@ public class ArticleServiceTests
     [Test]
     public void RebuildIndex_SingleException_LogsErrors()
     {
-        _fileReaderMock.Setup(s => s.GetMarkdownFiles(Any.String))
+        _fileReaderMock.Setup(s => s.GetMarkdownFiles())
             .Returns(new Try<IEnumerable<Article>>([], new()));
         _articleService.RebuildIndex();
 
