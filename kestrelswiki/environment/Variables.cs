@@ -20,10 +20,6 @@ public static class Variables
         Environment.GetEnvironmentVariable("FILE_LOGGING")?.ToLowerInvariant() == "true";
 
     public static readonly string
-        WebPageRepo = Environment.GetEnvironmentVariable("WEBPAGE_REPOSITORY") ??
-                      "https://github.com/AceOfKestrels/kestrelsnest.git";
-
-    public static readonly string
         ContentRepository = Environment.GetEnvironmentVariable("CONTENT_REPOSITORY") ??
                             "https://github.com/AceOfKestrels/kestrelsnest.git";
 
