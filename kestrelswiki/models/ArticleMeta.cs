@@ -1,8 +1,12 @@
+using System.Text.Json.Serialization;
+
 namespace kestrelswiki.models;
 
 public class ArticleMeta
 {
-    public string? MirrorOf { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string Author { get; set; } = string.Empty;
+    [JsonPropertyName("mirrorOf")] public string? MirrorOf { get; set; }
+
+    [JsonPropertyName("title")] public string? Title { get; set; }
+
+    [JsonPropertyName("author")] public string? Author { get; set; }
 }

@@ -3,7 +3,6 @@ using kestrelswiki.models;
 using kestrelswiki.service.article;
 using kestrelswiki.service.file;
 using kestrelswiki.tests.helper;
-using Microsoft.Extensions.Logging;
 using Moq;
 using ILogger = kestrelswiki.logging.logger.ILogger;
 
@@ -69,7 +68,7 @@ public class ArticleServiceTests
             .Returns(new Try<IEnumerable<Article>>([], new AggregateException([new(), new()])));
         _articleService.RebuildIndex();
 
-        _loggerMock.Verify(s => s.Write(It.IsAny<LogLevel>(), Any.String), Times.Exactly(2));
+        _loggerMock.Verify(s => s.Error(Any.String), Times.Exactly(2));
     }
 
     [Test]
@@ -79,7 +78,7 @@ public class ArticleServiceTests
             .Returns(new Try<IEnumerable<Article>>([], new()));
         _articleService.RebuildIndex();
 
-        _loggerMock.Verify(s => s.Write(It.IsAny<LogLevel>(), Any.String), Times.Once);
+        _loggerMock.Verify(s => s.Error(Any.String), Times.Once);
     }
 
     [Test]

@@ -24,7 +24,10 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
             .GetMarkdownFiles()
             .Then(result => result.ForEach(article => AddToIndex(article).Catch(exceptions.Add)))
             .Catch<AggregateException>(exception => exception.InnerExceptions.ForEach(ex => logger.Error(ex.Message)))
-            .Catch(exception => logger.Error(exception.Message));
+            .Catch(exception =>
+            {
+                if (exception is not AggregateException) logger.Error(exception.Message);
+            });
 
         return new(tri.Result is not null, new AggregateException(exceptions));
     }
@@ -39,12 +42,18 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
             })
             .Catch(ex => logger.Trace(ex));
 
+        if (article.Meta.MirrorOf is not null)
+        {
+            store.Set(article);
+            return new(true);
+        }
+
         Try<IEnumerable<Heading>> headings = ExtractHeadings(article.Content)
             .Then(result =>
             {
                 Heading[] headings = result as Heading[] ?? result.ToArray();
                 article.Headings = headings;
-                article.Meta.Title = headings[0].Name;
+                article.Meta.Title ??= headings[0].Name;
             })
             .Catch(ex => logger.Trace(ex));
         if (!headings.Success) return new(new("Title could not be found", headings.Exception));
@@ -59,7 +68,7 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
     {
         if (content.IsNullOrWhiteSpace()) return new(new("Article is empty"));
 
-        string fileMetaStr = content.Split('\n')[0];
+        string fileMetaStr = content.Split(Environment.NewLine)[0];
         try
         {
             ArticleMeta? meta = JsonSerializer.Deserialize<ArticleMeta>(fileMetaStr);
