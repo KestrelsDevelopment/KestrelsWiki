@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using kestrelswiki.extensions;
 using kestrelswiki.models;
 
 namespace kestrelswiki.service.file;
@@ -38,11 +39,20 @@ public class FileReader(ILogger logger) : IFileReader
         DirectoryInfo directory = new(path);
         if (!directory.Exists) return new([]);
 
-        List<Article> files = directory.GetFiles("*.md").Select(f => new Article
-        {
-            Path = f.FullName // should be relative path from content root
-        }).ToList();
         List<Exception> exceptions = [];
+        List<Article> files = directory
+            .GetFiles("*.md")
+            .Select(f =>
+            {
+                Try<string> fileContent = TryReadAllText(f.FullName).Catch(ex => exceptions.Add(ex));
+                return new Article
+                {
+                    Path = f.FullName, // should be relative path from content root
+                    Content = fileContent.Result ?? string.Empty
+                };
+            })
+            .Where(a => !a.Content.IsNullOrWhiteSpace())
+            .ToList();
 
         foreach (DirectoryInfo subDir in directory.GetDirectories().ToList().FindAll(d => d.Name != ".git"))
         {
