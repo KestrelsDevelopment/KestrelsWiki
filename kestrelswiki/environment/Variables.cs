@@ -21,7 +21,7 @@ public static class Variables
 
     public static readonly string
         ContentRepository = Environment.GetEnvironmentVariable("CONTENT_REPOSITORY") ??
-                            "https://github.com/AceOfKestrels/kestrelsnest.git";
+                            "https://github.com/AceOfKestrels/brain.git";
 
     public static readonly string LogDateFormat =
         Environment.GetEnvironmentVariable("LOG_DATE_FORMAT") ?? ILogger.DefaultDateFormat;
