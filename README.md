@@ -4,6 +4,10 @@ The backend API for for my wiki site.
 
 ## Documentation
 
+### Prerequisite's
+- install git
+  
+
 ### Environment Variables
 The following environment variables are read by the application:
 - FILE_LOGGING (default: false) - Enables logging to a file
