@@ -28,6 +28,7 @@ public class WebpageController(
         if (!Variables.EnableWebpageApi) return NotFound();
 
         LogIncomingRequest();
+
         return File(homePage.HtmlPath) ?? GetNotFoundPage();
     }
 
@@ -40,6 +41,7 @@ public class WebpageController(
         if (!Variables.EnableWebpageApi) return NotFound();
 
         LogIncomingRequest();
+
         return File(Path.Combine(homePage.DirPath, path)) ?? GetNotFoundPage();
     }
 
@@ -52,12 +54,12 @@ public class WebpageController(
         if (!Variables.EnableWebpageApi) return NotFound();
 
         LogIncomingRequest();
+
         return File(frontPage.HtmlPath) ?? GetNotFoundPage();
     }
 
     /// <summary>
     ///     A file relative to /wiki/
-    ///     Or a file relative to /wiki/*article/ if that does not exist
     ///     Or the article page at /wiki/article/ if that does not exist
     ///     Or the not found page if no article exists at this path
     /// </summary>
@@ -67,10 +69,25 @@ public class WebpageController(
         if (!Variables.EnableWebpageApi) return NotFound();
 
         LogIncomingRequest();
+
         return File(Path.Combine(frontPage.DirPath, path))
-               ?? File(Path.Combine(articlePage.DirPath, path))
                ?? (articleService.Exists(path) ? File(articlePage.HtmlPath) : GetNotFoundPage())
                ?? GetNotFoundPage();
+    }
+
+    /// <summary>
+    ///     A file relative to /wiki/*article/ if that does not exist
+    ///     Or a 404 if no article exists at this path
+    /// </summary>
+    [HttpGet("wikiarticle/{*path}")]
+    public ActionResult GetWikiArticleFile(string path)
+    {
+        if (!Variables.EnableWebpageApi) return NotFound();
+
+        LogIncomingRequest();
+
+        return File(Path.Combine(articlePage.DirPath, path))
+               ?? NotFound();
     }
 
     /// <summary>
@@ -82,6 +99,7 @@ public class WebpageController(
         if (!Variables.EnableWebpageApi) return NotFound();
 
         LogIncomingRequest();
+
         return File(Path.Combine(
             Directory.GetCurrentDirectory(),
             Variables.WebRootPath,
@@ -94,6 +112,7 @@ public class WebpageController(
     {
         ActionResult? result = webpageService.TryGetFile(physicalPath).Result;
         if (result != null) logger.Debug($"Returning file at {physicalPath}");
+
         return result;
     }
 
@@ -101,12 +120,14 @@ public class WebpageController(
     {
         ActionResult? result = File(notFoundPage.HtmlPath);
         if (result == null) logger.Info("Not found page not found!");
+
         return result ?? NotFound();
     }
 
     protected class WebpageInfo(string dirPath)
     {
         public string DirPath { get; } = Path.Combine(Directory.GetCurrentDirectory(), Variables.WebRootPath, dirPath);
+
         public string HtmlPath => Path.Combine(DirPath, "index.html");
     }
 }
