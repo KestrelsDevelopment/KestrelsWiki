@@ -1,3 +1,4 @@
+using Castle.Components.DictionaryAdapter.Xml;
 using kestrelswiki.logging;
 using kestrelswiki.models;
 using kestrelswiki.service.article;
@@ -55,7 +56,7 @@ public class ArticleServiceTests
     [Test]
     public void RebuildIndex_FetchesListOfArticles()
     {
-        _fileReaderMock.Setup(s => s.GetMarkdownFiles()).Returns(new Try<IEnumerable<Article>>([]));
+        _fileReaderMock.Setup(s => s.GetMarkdownFiles()).Returns(new List<Article>());
         _articleService.RebuildIndex();
 
         _fileReaderMock.Verify(s => s.GetMarkdownFiles(), Times.AtLeastOnce);
@@ -65,7 +66,8 @@ public class ArticleServiceTests
     public void RebuildIndex_AggregateException_LogsErrors()
     {
         _fileReaderMock.Setup(s => s.GetMarkdownFiles())
-            .Returns(new Try<IEnumerable<Article>>([], new AggregateException([new(), new()])));
+            .Returns(([], new AggregateException([new(), new()])));
+
         _articleService.RebuildIndex();
 
         _loggerMock.Verify(s => s.Error(Any.String), Times.Exactly(2));
@@ -75,7 +77,8 @@ public class ArticleServiceTests
     public void RebuildIndex_SingleException_LogsErrors()
     {
         _fileReaderMock.Setup(s => s.GetMarkdownFiles())
-            .Returns(new Try<IEnumerable<Article>>([], new()));
+            .Returns(([], new()));
+
         _articleService.RebuildIndex();
 
         _loggerMock.Verify(s => s.Error(Any.String), Times.Once);

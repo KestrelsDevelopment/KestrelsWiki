@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using CliWrap;
 using kestrelswiki.environment;
+using kestrelswiki.extensions;
 using kestrelswiki.service.file;
 
 namespace kestrelswiki.service.git;
@@ -10,7 +11,8 @@ public class GitService(ILogger logger, IFileWriter fileWriter) : IGitService
     public async Task<Try<bool>> TryPullContentRepositoryAsync()
     {
         Try<bool> tri = fileWriter.CreateDirectory(Variables.ContentPath);
-        if (!tri.Success) return Try<bool>.Fail(tri.Exception?.Message ?? "error creating directory", tri.Exception);
+
+        if (!tri.Success) return new Exception(tri.Exception?.Message ?? "error creating directory", tri.Exception);
 
         logger.Info("Running git pull for content repository");
         string output = string.Empty;
@@ -23,7 +25,7 @@ public class GitService(ILogger logger, IFileWriter fileWriter) : IGitService
             .Then(_ => logger.Info(output))
             .Catch(e => logger.Error($"git pull failed: {(string.IsNullOrWhiteSpace(output) ? e.Message : output)}"));
 
-        return pullResult.Success ? new(true) : await TryCloneContentRepositoryAsync();
+        return pullResult.Success ? true : await TryCloneContentRepositoryAsync();
     }
 
     private async Task<Try<bool>> TryCloneContentRepositoryAsync()
@@ -38,24 +40,25 @@ public class GitService(ILogger logger, IFileWriter fileWriter) : IGitService
         Try<CommandResult> cloneResult = (await TryRunCommandAsync(command))
             .Then(_ => logger.Info(output))
             .Catch(
-                e => logger.Critical($"git clone failed: {(string.IsNullOrWhiteSpace(output) ? e.Message : output)}"));
+                e => logger.Critical($"git clone failed: {(output.IsNullOrWhiteSpace() ? e.Message : output)}"));
 
-        return cloneResult.Success ? new(true) : Try<bool>.Fail(output);
+        return cloneResult.Success ? true : new Exception(output);
     }
 
-    private async Task<Try<CommandResult>> TryRunCommandAsync(Command command)
+    protected async Task<Try<CommandResult>> TryRunCommandAsync(Command command)
     {
         try
         {
             CommandTask<CommandResult> task = command.WithValidation(CommandResultValidation.None).ExecuteAsync();
             CommandResult result = await task.Task;
+
             return result.IsSuccess
-                ? new(result)
-                : Try<CommandResult>.Fail($"Exit code does not indicate success. ({result.ExitCode})");
+                ? result
+                : new Exception($"Exit code does not indicate success. ({result.ExitCode})");
         }
         catch (Exception e)
         {
-            return Try<CommandResult>.Fail(e.Message);
+            return e;
         }
     }
 }

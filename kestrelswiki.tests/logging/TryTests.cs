@@ -8,7 +8,7 @@ public class TryTests
     public void Constructor_Success_CreatesSuccessInstanceWithResult()
     {
         string value = "value";
-        Try<string> tri = new(value);
+        Try<string> tri = value;
 
         Assert.Multiple(() =>
         {
@@ -21,7 +21,7 @@ public class TryTests
     [Test]
     public void Constructor_Fail_CreatesFailedInstanceWithException()
     {
-        Try<string> tri = new(new());
+        Try<string> tri = new Exception();
 
         Assert.Multiple(() =>
         {
@@ -34,7 +34,7 @@ public class TryTests
     [Test]
     public void Catch_ReturnsInstance()
     {
-        Try<string> tri = new("value");
+        Try<string> tri = "value";
 
         Try<string> caught = tri.Catch(_ => { });
 
@@ -44,7 +44,7 @@ public class TryTests
     [Test]
     public void Then_ReturnsInstance()
     {
-        Try<string> tri = new("value");
+        Try<string> tri = "value";
 
         Try<string> caught = tri.Then(_ => { });
 
@@ -54,7 +54,7 @@ public class TryTests
     [Test]
     public void Then_Success_RunsAction()
     {
-        Try<string> tri = new("value");
+        Try<string> tri = "value";
         bool run = false;
 
         tri.Then(_ => run = true);
@@ -65,7 +65,7 @@ public class TryTests
     [Test]
     public void Then_Fail_DoesNotRun()
     {
-        Try<string> tri = new(new());
+        Try<string> tri = new Exception();
         bool run = false;
 
         tri.Then(_ => run = true);
@@ -76,7 +76,7 @@ public class TryTests
     [Test]
     public void Catch_Fail_RunsAction()
     {
-        Try<string> tri = new(new());
+        Try<string> tri = new Exception();
         bool run = false;
 
         tri.Catch(_ => run = true);
@@ -87,7 +87,7 @@ public class TryTests
     [Test]
     public void Catch_Success_DoesNotRun()
     {
-        Try<string> tri = new("value");
+        Try<string> tri = "value";
         bool run = false;
 
         tri.Catch(_ => run = true);

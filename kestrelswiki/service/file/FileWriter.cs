@@ -13,10 +13,11 @@ public class FileWriter(ILogger logger) : IFileWriter
         catch (Exception e)
         {
             logger.Error(e);
-            return Try<bool>.Fail($"Unable to write file at {fileName}: {e.Message}");
+
+            return new Exception($"Unable to write file at {fileName}: {e.Message}");
         }
 
-        return new(true);
+        return true;
     }
 
     public Try<bool> WriteLine(string contents, string fileName)
@@ -33,9 +34,10 @@ public class FileWriter(ILogger logger) : IFileWriter
         catch (Exception e)
         {
             logger.Error(e);
-            return Try<bool>.Fail(e.Message, e);
+
+            return e;
         }
 
-        return new(true);
+        return true;
     }
 }

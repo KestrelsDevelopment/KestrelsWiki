@@ -11,26 +11,28 @@ public class FileReader(ILogger logger) : IFileReader
     public Try<string> TryReadAllText(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
-            return new(new ArgumentException("Unable to read file: Path is empty."));
+            return new Exception("Unable to read file: Path is empty.");
 
         return TryReadAllText(new FileInfo(Path.GetFullPath(path)));
     }
 
     public Try<string> TryReadAllText(FileInfo file)
     {
-        if (!file.Exists) return Try<string>.Fail("File does not exist.");
+        if (!file.Exists) return new Exception("File does not exist.");
 
         try
         {
             using FileStream stream = file.OpenRead();
             using StreamReader reader = new(stream);
-            return new(reader.ReadToEnd());
+
+            return reader.ReadToEnd();
         }
         catch (Exception e)
         {
             string errorMessage = $"Unable to read file at {file.FullName}: {e.Message}";
             logger.Error(errorMessage);
-            return Try<string>.Fail(errorMessage, e);
+
+            return e;
         }
     }
 
@@ -47,6 +49,7 @@ public class FileReader(ILogger logger) : IFileReader
         while (directories.Count > 0)
         {
             DirectoryInfo directory = directories.Pop();
+
             if (!directory.Exists) continue;
 
             articles.AddRange(directory.GetFiles("*.md")
@@ -54,6 +57,7 @@ public class FileReader(ILogger logger) : IFileReader
                 .Select(f =>
                 {
                     Try<string> fileContent = TryReadAllText(f.FullName).Catch(ex => exceptions.Add(ex));
+
                     return new Article
                     {
                         Path = f.FullName[contentPathLength..].Replace(Path.DirectorySeparatorChar, '/'),
@@ -67,18 +71,18 @@ public class FileReader(ILogger logger) : IFileReader
                 .ForEach(directories.Push);
         }
 
-        return new(articles, exceptions.Count > 0 ? new AggregateException(exceptions) : null);
+        return (articles, exceptions.Count > 0 ? new AggregateException(exceptions) : null);
     }
 
     public Try<bool> Exists(string path)
     {
         try
         {
-            return new(File.Exists(path));
+            return File.Exists(path);
         }
         catch (Exception e)
         {
-            return Try<bool>.Fail(e.Message);
+            return e;
         }
     }
 }

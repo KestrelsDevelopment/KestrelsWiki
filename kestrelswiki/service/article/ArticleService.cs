@@ -29,7 +29,7 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
                 if (exception is not AggregateException) logger.Error(exception.Message);
             });
 
-        return new(tri.Result is not null, new AggregateException(exceptions));
+        return (tri.Result is not null, new AggregateException(exceptions));
     }
 
     protected Try<bool> AddToIndex(Article article)
@@ -45,7 +45,8 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
         if (article.Meta.MirrorOf is not null)
         {
             store.Set(article);
-            return new(true);
+
+            return true;
         }
 
         Try<IEnumerable<Heading>> headings = ExtractHeadings(article.Content)
@@ -56,35 +57,39 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
                 article.Meta.Title ??= headings[0].Name;
             })
             .Catch(ex => logger.Trace(ex));
-        if (!headings.Success) return new(new("Title could not be found", headings.Exception));
+
+        if (!headings.Success) return new Exception("Title could not be found", headings.Exception);
 
         article.Content = RenderMarkdown(article.Content);
         store.Set(article);
 
-        return new(true);
+        return true;
     }
 
     protected Try<(ArticleMeta meta, string remainingContent)> ExtractFileMeta(string content)
     {
-        if (content.IsNullOrWhiteSpace()) return new(new("Article is empty"));
+        if (content.IsNullOrWhiteSpace()) return new Exception("Article is empty");
 
         string fileMetaStr = content.Split(Environment.NewLine)[0];
+
         try
         {
             ArticleMeta? meta = JsonSerializer.Deserialize<ArticleMeta>(fileMetaStr);
+
             if (meta is null) throw new JsonException("Deserialized result is null");
-            return new((meta, content[fileMetaStr.Length..]));
+
+            return (meta, content[fileMetaStr.Length..]);
         }
         catch (JsonException e)
         {
-            return new((new(), content), new("No article meta found", e));
+            return ((new(), content), new Exception("No article meta found", e));
         }
     }
 
     protected Try<IEnumerable<Heading>> ExtractHeadings(string content)
     {
-        if (content.IsNullOrWhiteSpace()) return new(new("Article is empty"));
-        if (!content.StartsWith("# ")) return new(new("No title found"));
+        if (content.IsNullOrWhiteSpace()) return new Exception("Article is empty");
+        if (!content.StartsWith("# ")) return new Exception("No title found");
 
         List<Heading> result = [];
         string[] lines = content.Split(Environment.NewLine);
@@ -96,12 +101,13 @@ public class ArticleService(ILogger logger, IFileReader fileReader, IArticleStor
                  || line.StartsWith("### ")))
             .ForEach(line => result.Add(new() { Name = line[2..] }));
 
-        return new(result);
+        return result;
     }
 
     protected string RenderMarkdown(string content)
     {
         MarkdownPipeline pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+
         return Markdown.ToHtml(content, pipeline);
     }
 }
