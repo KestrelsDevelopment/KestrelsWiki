@@ -21,3 +21,4 @@ The following environment variables are read by the application:
   - Possible values: Trace, Debug, Information, Warning, Error, Critical, None
 - DISABLED_LOG_DOMAINS (default: none) - A comma-separated list of log domains that will not be logged.
   - See [LogDomain.cs](https://github.com/AceOfKestrels/KestrelsWiki/blob/main/kestrelswiki/logging/logFormat/LogDomain.cs) for a list of available log domains.
+- LOG_STACKTRACES: (default: false) - Enables logging of the entire stacktrace if an error is returned.

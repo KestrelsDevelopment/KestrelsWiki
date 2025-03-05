@@ -19,6 +19,9 @@ public static class Variables
     public static readonly bool EnableFileLogging =
         Environment.GetEnvironmentVariable("FILE_LOGGING")?.ToLowerInvariant() == "true";
 
+    public static readonly bool LogStacktraces =
+        Environment.GetEnvironmentVariable("LOG_STACKTRACES")?.ToLowerInvariant() == "true";
+
     public static readonly string
         ContentRepository = Environment.GetEnvironmentVariable("CONTENT_REPOSITORY") ??
                             "https://github.com/AceOfKestrels/brain.git";
