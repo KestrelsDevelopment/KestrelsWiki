@@ -1,20 +1,19 @@
 using System.Threading.Tasks;
+using kestrelswiki.environment;
+using kestrelswiki.service.file;
 
 namespace kestrelswiki.service.git;
 
-public class DevGitService(ILogger logger) : IGitService
+public class DevGitService(ILogger logger, IFileReader fileReader) : IGitService
 {
-    public async Task<Try<bool>> TryCloneWebPageRepositoryAsync()
-    {
-        logger.Info("Running git clone for webpage repository");
-
-        return true;
-    }
-
     public async Task<Try<bool>> TryPullContentRepositoryAsync()
     {
-        logger.Info("Running git pull for content repository");
+        await Task.Run(() => { }); // just to satisfy the async
+        logger.Info("Running in dev mode. In prod, would pull content repo.");
+        Try<bool> result = fileReader.Exists(Variables.WebRootPath);
 
-        return true;
+        if (!result.Success) return new Exception("Could not check content repo", result.Exception);
+
+        return result.Result;
     }
 }

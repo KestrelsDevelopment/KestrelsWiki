@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using kestrelswiki.environment;
 using kestrelswiki.logging.logFormat;
 using kestrelswiki.logging.loggerFactory;
+using kestrelswiki.service;
 using kestrelswiki.service.article;
 using kestrelswiki.service.file;
 using kestrelswiki.service.git;
@@ -34,6 +35,7 @@ public class Program
             s.GetRequiredService<IFileReader>(),
             s.GetRequiredService<IArticleStore>()
         ));
+
         builder.Services.AddScoped<IContentTypeProvider, FileExtensionContentTypeProvider>();
         builder.Services.AddScoped<IWebpageService>(s => new WebpageService(
             lf.Create(LogDomain.WebpageService),
@@ -44,11 +46,13 @@ public class Program
         builder.Services.AddControllers();
 
         builder.Services.AddScoped<IGitService>(builder.Environment.IsDevelopment()
-            ? _ => new DevGitService(lf.Create(LogDomain.GitService))
+            ? s => new DevGitService(lf.Create(LogDomain.GitService), s.GetRequiredService<IFileReader>())
             : s => new GitService(lf.Create(LogDomain.GitService), s.GetRequiredService<IFileWriter>()));
 
         logger.Info("Building host");
         WebApplication app = builder.Build();
+
+        Services.Init(app.Services);
 
         app.UseForwardedHeaders(new()
         {
@@ -56,11 +60,28 @@ public class Program
                                ForwardedHeaders.XForwardedProto,
             ForwardLimit = 2
         });
+
         app.MapControllers();
 
         using (IServiceScope scope = app.Services.CreateScope())
         {
-            await scope.ServiceProvider.GetRequiredService<IGitService>().TryPullContentRepositoryAsync();
+            var (ok, err) = await scope.ServiceProvider.GetRequiredService<IGitService>()
+                .TryPullContentRepositoryAsync();
+
+            if (err != null)
+            {
+                logger.Critical(err.Message);
+
+                return;
+            }
+
+            if (!ok)
+            {
+                logger.Critical("Could not pull content repository. No error was returned.");
+
+                return;
+            }
+
             scope.ServiceProvider.GetRequiredService<IArticleService>().RebuildIndex();
         }
 
