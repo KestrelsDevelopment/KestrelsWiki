@@ -74,7 +74,7 @@ public class Try<T> where T : notnull
         ILogger? logger = scope.ServiceProvider.GetService<ILoggerFactory>()?.Create(LogDomain.Try);
 
         logger?.Warning(
-            $"Try<{typeof(T).Name}> was initialized {(ex.Source is null ? "" : $"by {ex.Source}")} with an exception: {ex}>");
+            $"Try<{typeof(T).Name}> was initialized {(ex.Source is null ? "" : $"by {ex.Source}")} with an exception: {ex.Message}");
 
         if (Variables.LogStacktraces)
             logger?.Warning(ex.StackTrace ?? ex.InnerException?.StackTrace ?? string.Empty);

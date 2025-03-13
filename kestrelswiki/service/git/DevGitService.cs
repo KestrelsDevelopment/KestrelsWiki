@@ -10,7 +10,7 @@ public class DevGitService(ILogger logger, IFileReader fileReader) : IGitService
     {
         await Task.Run(() => { }); // just to satisfy the async
         logger.Info("Running in dev mode. In prod, would pull content repo.");
-        Try<bool> result = fileReader.Exists(Variables.WebRootPath);
+        Try<bool> result = fileReader.DirectoryExists(Variables.ContentPath);
 
         if (!result.Success) return new Exception("Could not check content repo", result.Exception);
 

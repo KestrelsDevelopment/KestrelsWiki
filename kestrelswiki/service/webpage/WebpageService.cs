@@ -17,7 +17,7 @@ public class WebpageService(ILogger logger, IFileReader fileReader, IContentType
         {
             tri = FormatErrorMessage(path, "Path is empty.");
         }
-        else if (!fileReader.Exists(path).Result)
+        else if (!fileReader.FileExists(path).Result)
         {
             tri = FormatErrorMessage(path, "File not found.");
         }

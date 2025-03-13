@@ -18,5 +18,7 @@ public interface IFileReader
     /// <returns>An IEnumerable of FileInfos referring to .md files in the given directory and all subdirectories.</returns>
     Try<IEnumerable<Article>> GetMarkdownFiles();
 
-    Try<bool> Exists(string path);
+    Try<bool> FileExists(string path);
+
+    Try<bool> DirectoryExists(string path);
 }

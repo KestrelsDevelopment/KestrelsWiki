@@ -74,11 +74,23 @@ public class FileReader(ILogger logger) : IFileReader
         return (articles, exceptions.Count > 0 ? new AggregateException(exceptions) : null);
     }
 
-    public Try<bool> Exists(string path)
+    public Try<bool> FileExists(string path)
     {
         try
         {
             return File.Exists(path);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
+    public Try<bool> DirectoryExists(string path)
+    {
+        try
+        {
+            return Directory.Exists(path);
         }
         catch (Exception e)
         {
