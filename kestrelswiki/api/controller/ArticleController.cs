@@ -9,13 +9,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace kestrelswiki.api.controller;
 
 [ApiController]
-[Route("api/article")]
+[Route("article")]
 public class ArticleController(ILoggerFactory loggerFactory, IArticleStore articleStore)
     : KestrelsController(loggerFactory, LogDomain.ArticleController)
 {
     [HttpGet("{*path}")]
     public ActionResult GetArticle(string path)
     {
+        LogIncomingRequest();
+
         Article? article = articleStore.Get(path);
 
         if (article is null) return NotFound();

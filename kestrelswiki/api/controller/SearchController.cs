@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace kestrelswiki.api.controller;
 
 [ApiController]
-[Route("api/search")]
+[Route("search")]
 public class SearchController(ILoggerFactory loggerFactory)
     : KestrelsController(loggerFactory, LogDomain.SearchController)
 {
